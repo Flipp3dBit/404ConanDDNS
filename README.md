@@ -1,6 +1,6 @@
 # Conan Serverstatus
 
-Kleine, PIN-geschützte Netlify-Seite für den Conan-Exiles-Server unter `lab.404gnf.de`.
+Kleine, PIN-geschützte Netlify-Seite für den Conan-Exiles-Enhanced-Server unter `lab.404gnf.de`.
 
 ## Auf Netlify veröffentlichen
 
@@ -25,7 +25,9 @@ Für `SESSION_SECRET` lässt sich lokal ein geeigneter Wert erzeugen:
 
 ## Router / Firewall
 
-Der Router muss UDP `20010` an den Gameport und UDP `20011` an den Queryport des Conan-Servers weiterleiten. Die Seite fragt den A-Record bei Cloudflare, Google und AdGuard ab und zeigt, ob alle bereits dieselbe IP liefern. Anschließend verwendet der Query-Check Steam A2S_INFO auf Port `20011`. Bei erfolgreicher Antwort zeigt die Seite Servername, Karte, Spielerzahl und Antwortzeit.
+Der Router muss UDP `20010` an den Gameport und UDP `20011` an den Queryport des Conan-Servers weiterleiten. Die Seite fragt den A-Record bei Cloudflare, Google und AdGuard ab und zeigt, ob alle bereits dieselbe IP liefern. Anschließend verwendet der Query-Check Steam A2S_INFO einschließlich des modernen Challenge-Handshakes auf Port `20011`. Bei erfolgreicher Antwort zeigt die Seite Servername, Karte, Spielerzahl und Antwortzeit.
+
+Die angezeigte Direct-Connect-Adresse verwendet immer die aufgelöste öffentliche IP mit dem Gameport, also `IP:20010`. Der Button **Enhanced starten** öffnet Steam-App `440900` mit `+connect IP:20010`. Falls der Browser externe Steam-Links blockiert oder Enhanced den Startparameter nicht übernimmt, kann die Adresse angeklickt und anschließend im Direct-Connect-Dialog von Conan Exiles Enhanced eingefügt werden.
 
 ## Lokal testen
 

@@ -41,32 +41,52 @@ function parseA2sInfo(message) {
   return { name, map, players, maxPlayers, bots };
 }
 
-function queryServer(host, port, timeoutMs = 2500) {
+function queryServer(host, port, timeoutMs = 4500) {
   return new Promise((resolve, reject) => {
     const socket = dgram.createSocket("udp4");
     let settled = false;
+    let attempts = 0;
+    const retryTimers = [];
     const startedAt = Date.now();
 
     const finish = (error, result) => {
       if (settled) return;
       settled = true;
       clearTimeout(timer);
+      retryTimers.forEach(clearTimeout);
       socket.close();
       error ? reject(error) : resolve(result);
     };
 
     const timer = setTimeout(() => finish(new Error("Zeitüberschreitung")), timeoutMs);
     socket.once("error", (error) => finish(error));
-    socket.once("message", (message) => {
+    socket.on("message", (message) => {
       try {
+        // Modern Steam servers may require a challenge before returning A2S_INFO.
+        if (message.length >= 9 && message.readInt32LE(0) === -1 && message[4] === 0x41) {
+          const challenge = message.subarray(5, 9);
+          socket.send(Buffer.concat([A2S_INFO_REQUEST, challenge]), port, host, (error) => {
+            if (error) finish(error);
+          });
+          return;
+        }
         finish(null, { ...parseA2sInfo(message), latencyMs: Date.now() - startedAt });
       } catch (error) {
         finish(error);
       }
     });
-    socket.send(A2S_INFO_REQUEST, port, host, (error) => {
-      if (error) finish(error);
-    });
+
+    const sendQuery = () => {
+      if (settled || attempts >= 3) return;
+      attempts += 1;
+      socket.send(A2S_INFO_REQUEST, port, host, (error) => {
+        if (error) finish(error);
+      });
+    };
+
+    sendQuery();
+    retryTimers.push(setTimeout(sendQuery, 1200));
+    retryTimers.push(setTimeout(sendQuery, 2600));
   });
 }
 
@@ -133,7 +153,7 @@ export default async (request) => {
   try {
     const server = await queryServer(address, queryPort);
     return json({ online: true, host, address, gamePort, queryPort, checkedAt, dnsResolvers, dnsSynced, server });
-  } catch {
+  } catch (error) {
     return json({
       online: false,
       host,
@@ -143,7 +163,8 @@ export default async (request) => {
       checkedAt,
       dnsResolvers,
       dnsSynced,
-      error: "Keine Antwort vom Conan-Query-Port erhalten.",
+      error: "Keine verwertbare Antwort vom Conan-Query-Port erhalten.",
+      queryDetail: error?.message || "Unbekannter Query-Fehler",
     });
   }
 };

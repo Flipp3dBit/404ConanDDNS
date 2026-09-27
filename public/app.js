@@ -6,6 +6,7 @@ const pinInput = document.querySelector("#pin");
 const refreshButton = document.querySelector("#refresh");
 const logoutButton = document.querySelector("#logout");
 const copyButton = document.querySelector("#copy-address");
+const directConnect = document.querySelector("#direct-connect");
 
 const fields = {
   badge: document.querySelector("#status-badge"),
@@ -73,6 +74,8 @@ async function fetchStatus() {
   setBadge("checking", "Prüfe …");
   fields.message.className = "message";
   fields.message.textContent = "DynDNS und Query-Port werden geprüft.";
+  directConnect.setAttribute("aria-disabled", "true");
+  directConnect.href = "#";
 
   try {
     const response = await fetch("/api/status", { credentials: "same-origin", cache: "no-store" });
@@ -82,7 +85,8 @@ async function fetchStatus() {
     }
 
     const data = await response.json();
-    fields.address.textContent = `${data.host}:${data.gamePort}`;
+    const connectAddress = data.address ? `${data.address}:${data.gamePort}` : "—";
+    fields.address.textContent = connectAddress;
     fields.ip.textContent = data.address || "Nicht aufgelöst";
     fields.gamePort.textContent = `${data.gamePort} / UDP`;
     fields.queryPort.textContent = `${data.queryPort} / UDP`;
@@ -92,13 +96,21 @@ async function fetchStatus() {
     fields.lastCheck.textContent = `Geprüft um ${formatCheckedAt(data.checkedAt)}`;
     renderDns(data);
 
+    if (data.address) {
+      // Conan Exiles Enhanced keeps Steam app id 440900 and accepts +connect IP:gameport.
+      directConnect.href = `steam://run/440900//+connect%20${encodeURIComponent(connectAddress)}`;
+      directConnect.removeAttribute("aria-disabled");
+    }
+
     if (data.online) {
       setBadge("online", "Online");
       fields.message.textContent = data.server?.name ? `${data.server.name} antwortet auf dem Query-Port.` : "Der Server antwortet auf dem Query-Port.";
     } else {
-      setBadge("offline", "Nicht erreichbar");
-      fields.message.className = "message error";
-      fields.message.textContent = data.error || "Der Server hat nicht geantwortet.";
+      setBadge(data.address ? "checking" : "offline", data.address ? "Query offen" : "DNS-Fehler");
+      fields.message.className = data.address ? "message" : "message error";
+      fields.message.textContent = data.address
+        ? `${data.error} DNS und Connect-Adresse sind verfügbar; probiere „Enhanced starten“ oder kopiere die Adresse für Direct Connect im Spiel.`
+        : (data.error || "Der Servername konnte nicht aufgelöst werden.");
     }
   } catch {
     setBadge("offline", "Fehler");

@@ -263,6 +263,23 @@ button:disabled { cursor: wait; opacity: 0.65; transform: none; }
 .actions { display: flex; align-items: center; gap: 0.75rem; margin-top: 1.5rem; }
 .secondary { border-color: var(--line); color: var(--ink); background: var(--surface-raised); }
 .secondary:hover { border-color: var(--ember); background: #302319; }
+.connect-button {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  padding: 0.72rem 1.25rem;
+  color: #1a1009;
+  font-weight: 760;
+  text-decoration: none;
+  background: var(--ember-bright);
+  transition: transform 150ms ease, background 150ms ease;
+}
+.connect-button:hover { background: #ffc077; transform: translateY(-1px); }
+.connect-button:focus-visible { outline: 3px solid rgba(240, 168, 92, 0.45); outline-offset: 3px; }
+.connect-button[aria-disabled="true"] { pointer-events: none; opacity: 0.5; }
 .text-button { min-height: 42px; padding-inline: 0.75rem; color: var(--muted); background: transparent; }
 .text-button:hover { color: var(--ink); background: rgba(255, 255, 255, 0.04); }
 .last-check { margin-left: auto; color: var(--muted); font-size: 0.76rem; }
