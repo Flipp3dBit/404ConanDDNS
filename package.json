@@ -1,0 +1,13 @@
+{
+  "name": "conan-status-site",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx netlify-cli dev",
+    "check": "node --check netlify/functions/auth.mjs && node --check netlify/functions/status.mjs && node --check public/app.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

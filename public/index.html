@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#110e0b" />
+    <meta name="description" content="Privater Statuscheck für einen Conan Exiles Server." />
+    <title>Exiles Serverwacht</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23110e0b'/%3E%3Cpath d='M32 8 48 17v20L32 56 16 37V17z' fill='none' stroke='%23d7853b' stroke-width='5'/%3E%3Cpath d='m24 32 6 6 11-13' fill='none' stroke='%23f3dfbd' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <div class="grain" aria-hidden="true"></div>
+    <main class="shell">
+      <header class="brand">
+        <span class="brand-mark" aria-hidden="true">◇</span>
+        <span>Exiles Serverwacht</span>
+      </header>
+
+      <section id="login-view" class="panel login-panel" aria-labelledby="login-title">
+        <div class="eyebrow">Privater Zugang</div>
+        <h1 id="login-title">Die Wüste wartet.</h1>
+        <p>Gib die vereinbarte PIN ein, um Adresse und Serverstatus zu sehen.</p>
+        <form id="login-form">
+          <label for="pin">PIN</label>
+          <div class="input-row">
+            <input id="pin" name="pin" type="password" inputmode="numeric" autocomplete="current-password" required autofocus />
+            <button type="submit">Öffnen</button>
+          </div>
+          <p id="login-error" class="message error" role="alert" hidden></p>
+        </form>
+      </section>
+
+      <section id="status-view" class="panel status-panel" aria-labelledby="status-title" hidden>
+        <div class="status-heading">
+          <div>
+            <div class="eyebrow">Conan Exiles</div>
+            <h1 id="status-title">Serverstatus</h1>
+          </div>
+          <div id="status-badge" class="badge checking" aria-live="polite">
+            <span class="dot"></span><span>Prüfe …</span>
+          </div>
+        </div>
+
+        <div class="address-card">
+          <span class="label">Verbindung</span>
+          <button id="copy-address" class="address" type="button" title="Adresse kopieren">
+            <span id="server-address">—</span>
+            <span class="copy-icon" aria-hidden="true">⧉</span>
+          </button>
+          <span id="copy-note" class="copy-note" aria-live="polite"></span>
+        </div>
+
+        <dl class="facts">
+          <div><dt>Öffentliche IP</dt><dd id="public-ip">—</dd></div>
+          <div><dt>Gameport</dt><dd id="game-port">20010 / UDP</dd></div>
+          <div><dt>Queryport</dt><dd id="query-port">20011 / UDP</dd></div>
+          <div><dt>Spieler</dt><dd id="players">—</dd></div>
+          <div><dt>Karte</dt><dd id="map">—</dd></div>
+          <div><dt>Antwortzeit</dt><dd id="latency">—</dd></div>
+        </dl>
+
+        <div class="dns-section">
+          <div class="section-title">
+            <span>DNS-Verteilung</span>
+            <span id="dns-summary" class="dns-summary">Wird geprüft …</span>
+          </div>
+          <div id="dns-resolvers" class="dns-resolvers" aria-live="polite"></div>
+        </div>
+
+        <p id="status-message" class="message" aria-live="polite"></p>
+        <div class="actions">
+          <button id="refresh" class="secondary" type="button">Erneut prüfen</button>
+          <button id="logout" class="text-button" type="button">Abmelden</button>
+          <span id="last-check" class="last-check"></span>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
+
